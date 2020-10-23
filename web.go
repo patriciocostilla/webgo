@@ -7,7 +7,7 @@ import (
 func main() {
 	http.HandleFunc("/", HelloServer)
 	http.ListenAndServe(":8080", nil)
-}​​
+}​
 func HelloServer(w http.ResponseWriter, r *http.Request) {​​
 fmt.Fprintf(w, "Devops 2020\n")
 fmt.Fprintf(w, "Host: %s\n", os.Getenv("HOSTNAME"))
