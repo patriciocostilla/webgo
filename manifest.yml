@@ -1,0 +1,101 @@
+---
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: web-secret
+  namespace: web
+data:
+  SUPERSECRETPASS: TXlTZWNyZXRQYXNz
+  SUPERSECRETUSER: TXlTZWNyZXRVc2Vy
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-config-map
+  namespace: web
+data:
+  FOO: ImFOO
+  BAR: ImBAR
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: web-deployment
+  name: web-deployment
+  namespace: web
+spec:
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      run: web-deployment
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        run: web-deployment
+    spec:
+      containers:
+        - image: patriciocostilla/web:v2
+          imagePullPolicy: Always
+          name: web-deployment
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: FOO
+              valueFrom:
+                configMapKeyRef:
+                  name: web-config-map
+                  key: FOO
+            - name: BAR
+              valueFrom:
+                configMapKeyRef:
+                  name: web-config-map
+                  key: BAR
+            - name: SUPERSECRETPASS
+              valueFrom:
+                secretKeyRef:
+                  name: web-secret
+                  key: SUPERSECRETPASS
+            - name: SUPERSECRETUSER
+              valueFrom:
+                secretKeyRef:
+                  name: web-secret
+                  key: SUPERSECRETUSER
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clusterip-web-service
+  namespace: web
+spec:
+  selector:
+    run: web-deployment
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-ingress
+  namespace: web
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /foo
+            pathType: Prefix
+            backend:
+              service:
+                name: clusterip-web-service
+                port:
+                  number: 80
