@@ -4,6 +4,7 @@ pipeline {
     environment {
         dockerImage = ''
         credentials = 'docker-hub'
+        kubernetesToken = credentials('kubernetes-token')
     }
 
     stages {
