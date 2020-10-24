@@ -46,7 +46,7 @@ spec:
         run: web-deployment
     spec:
       containers:
-        - image: patriciocostilla/web:v2
+        - image: patriciocostilla/webgo:latest
           imagePullPolicy: Always
           name: web-deployment
           ports:
