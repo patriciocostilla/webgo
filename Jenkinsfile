@@ -23,6 +23,7 @@ pipeline {
                     script {
                         docker.withRegistry('', credentials) {
                             dockerImage.push()
+                            dockerImage.push('latest')
                         }  
                     }
                 }
