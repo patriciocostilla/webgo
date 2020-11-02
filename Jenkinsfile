@@ -33,7 +33,12 @@ pipeline {
             steps {
                 container('kubectl') {
                     script {
-                        sh 'kubectl --server https://10.0.2.10:6443 --token=${kubernetesToken} --insecure-skip-tls-verify apply -f manifest.yml'
+                        if (env.BRANCH_NAME == 'main') {
+                          sh 'kubectl --server https://10.0.2.10:6443 --token=${kubernetesToken} --insecure-skip-tls-verify apply -f manifest.yml'
+                        } else {
+                          echo "Skipping this part"
+                        }
+                        
                     }
                 }
             }
