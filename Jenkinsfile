@@ -42,9 +42,11 @@ pipeline {
                 container('docker') {
                     script {
                       if (env.BRANCH_NAME == 'main') {
-                        def image = docker.image("patriciocostilla/webgo:dev")
-                        image.pull()
-                        image.push('latest')
+                        docker.withRegistry('', credentials) {
+                          def image = docker.image("patriciocostilla/webgo:dev")
+                          image.pull()
+                          image.push('latest')
+                        }
                       } else {
                         echo "Skipping Promote"
                       }
