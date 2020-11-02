@@ -60,11 +60,11 @@ pipeline {
                     script {
                         if (env.BRANCH_NAME == 'main') {
                           sh 'kubectl --server https://10.0.2.10:6443 --token=${kubernetesToken} --insecure-skip-tls-verify apply -f manifest.prod.yml'
-                          sh 'kubectl --server https://10.0.2.10:6443 --token=${kubernetesToken} --insecure-skip-tls-verify rollout restart'
+                          sh 'kubectl --server https://10.0.2.10:6443 --token=${kubernetesToken} --insecure-skip-tls-verify rollout restart deployment/web-deployment -n web-prod'
                           sh 'kubectl --server https://10.0.2.10:6443 --token=${kubernetesToken} --insecure-skip-tls-verify rollout status deployment/web-deployment -n web-prod --timeout 5m'
                         } else {
                           sh 'kubectl --server https://10.0.2.10:6443 --token=${kubernetesToken} --insecure-skip-tls-verify apply -f manifest.yml'
-                          sh 'kubectl --server https://10.0.2.10:6443 --token=${kubernetesToken} --insecure-skip-tls-verify rollout restart'
+                          sh 'kubectl --server https://10.0.2.10:6443 --token=${kubernetesToken} --insecure-skip-tls-verify rollout restart deployment/web-deployment -n web'
                           sh 'kubectl --server https://10.0.2.10:6443 --token=${kubernetesToken} --insecure-skip-tls-verify rollout status deployment/web-deployment -n web --timeout 5m'
                         }
                     }
