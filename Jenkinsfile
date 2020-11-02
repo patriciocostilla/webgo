@@ -12,7 +12,11 @@ pipeline {
             steps {
                 container('docker') {
                     script {
+                      if (env.BRANCH_NAME == 'develop') {
                         dockerImage = docker.build "patriciocostilla/webgo:${BUILD_NUMBER}"
+                      } else {
+                        echo "Skipping Build"
+                      }
                     }
                 }
             }
@@ -21,10 +25,14 @@ pipeline {
             steps {
                 container('docker') {
                     script {
+                      if (env.BRANCH_NAME == 'develop') {
                         docker.withRegistry('', credentials) {
-                            dockerImage.push()
-                            dockerImage.push('latest')
-                        }  
+                          dockerImage.push()
+                          dockerImage.push('latest')
+                        }
+                      } else {
+                        echo "Skipping Publish"
+                      }
                     }
                 }
             }
@@ -36,9 +44,8 @@ pipeline {
                         if (env.BRANCH_NAME == 'main') {
                           sh 'kubectl --server https://10.0.2.10:6443 --token=${kubernetesToken} --insecure-skip-tls-verify apply -f manifest.yml'
                         } else {
-                          echo "Skipping this part"
+                          echo "Skipping Deploy"
                         }
-                        
                     }
                 }
             }
