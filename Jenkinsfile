@@ -28,10 +28,25 @@ pipeline {
                       if (env.BRANCH_NAME == 'develop') {
                         docker.withRegistry('', credentials) {
                           dockerImage.push()
-                          dockerImage.push('latest')
+                          dockerImage.push('dev')
                         }
                       } else {
                         echo "Skipping Publish"
+                      }
+                    }
+                }
+            }
+        }
+        stage('Promote') {
+            steps {
+                container('docker') {
+                    script {
+                      if (env.BRANCH_NAME == 'main') {
+                        def image = docker.image("patriciocostilla/webgo:dev")
+                        image.pull()
+                        image.push('latest')
+                      } else {
+                        echo "Skipping Promote"
                       }
                     }
                 }
